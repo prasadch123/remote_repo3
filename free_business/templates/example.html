@@ -1,0 +1,129 @@
+<div class="elementor-element elementor-element-e51923b aux-appear-watch-animation aux-mask-from-left elementor-widget elementor-widget-aux_image"
+                                                                             data-id="e51923b"
+                                                                             data-element_type="widget"
+                                                                             data-widget_type="aux_image.default">
+                                                                            <div class="elementor-widget-container">
+                                                                                <section
+                                                                                        class="widget-container aux-widget-image aux-alignnone aux-parent-aubc147f0c"
+                                                                                        style="">
+                                                                                    <div class="aux-media-hint-frame ">
+                                                                                        <div class="aux-media-image ">
+
+
+                                                                                            <img loading="lazy"
+                                                                                                 width="376"
+                                                                                                 height="366"
+                                                                                                 src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                                                                                                 class="aux-attachment aux-featured-image aux-attachment-id-789 aux-preload aux-blank"
+                                                                                                 alt="Mask_Group_82"
+                                                                                                 data-ratio="1.2"
+                                                                                                 data-original-w="376"
+                                                                                                 data-src="{% static 'images/staff_1.jpg' %}"/>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                </section><!-- widget-container -->
+                                                                            </div>
+                                                                        </div>
+
+CHAT BOX
+<script>
+    (function () {
+        const chatStorageFrame = document.getElementById('chat-storage');
+
+        chatStorageFrame.onload = function () {
+            window.addEventListener("message", messageHandler, false);
+            chatStorageFrame.contentWindow.postMessage({
+                action: 'get'
+            }, '*');
+
+            function messageHandler(event) {
+                if (!event.data.chatStorage) return;
+                event.data.chatStorage.forEach(item => superSetItem.call(window.localStorage, item.key, item.value));
+            }
+
+            const superSetItem = window.localStorage.setItem;
+            window.localStorage.setItem = function (key, value) {
+                superSetItem.call(this, key, value);
+
+                if (key.indexOf('hs-beacon') !== -1) {
+                    chatStorageFrame.contentWindow.postMessage({
+                        action: 'save',
+                        key: key,
+                        value: value,
+                    }, '*');
+                }
+            }
+        };
+    })();
+
+    (function () {
+        const superSetItem = window.localStorage.setItem;
+        window.localStorage.setItem = function (key, value) {
+            superSetItem.call(this, key, value);
+            if (key.indexOf('hs-beacon') !== -1) {
+                const data = JSON.parse(value);
+                if (data.user && data.user.email && !data.user.identified) {
+                    Beacon('identify', {
+                        email: data.user.email
+                    });
+                }
+            }
+        }
+    })();
+</script>
+
+<!-- BEGIN HScout -->
+<script type="text/javascript">!function (e, t, n) {
+    function a() {
+        var e = t.getElementsByTagName("script")[0], n = t.createElement("script");
+        n.type = "text/javascript", n.async = !0, n.src = "https://beacon-v2.helpscout.net", e.parentNode.insertBefore(n, e)
+    }
+
+    if (e.Beacon = n = function (t, n, a) {
+        e.Beacon.readyQueue.push({method: t, options: n, data: a})
+    }, n.readyQueue = [], "complete" === t.readyState) return a();
+    e.attachEvent ? e.attachEvent("onload", a) : e.addEventListener("load", a, !1)
+}(window, document, window.Beacon || function () {
+});</script>
+<script type="text/javascript">window.Beacon('init', '7954be8c-f44c-49ee-9348-a9e8776f86cd')</script>
+<!-- END HScout -->
+<script>
+
+    Beacon('on', 'ready', () => {
+        const state = beaconStore.getState();
+        const checkAgents = "https://chatapi.helpscout.net/v2/beacon/" + state.config.id + "/agents?deviceId=" + state.auth.deviceId;
+        let interval;
+
+        function open() {
+            jQuery.ajax(checkAgents, {
+                success: (data) => {
+                    if (data.agents && data.agents.length && window.innerWidth >= 1024) {
+                        Beacon('open');
+                        Beacon('navigate', '/ask/chat/');
+                        const audio = new Audio('https://cdn.averta.net/notification.mp3');
+                        audio.addEventListener('loadeddata', () => {
+                            audio.play().catch(console.log);
+                        });
+
+                        clearInterval(interval);
+                        window.sessionStorage.setItem('hs-proactive-beacon-time', Date.now());
+                    }
+                }
+            });
+        }
+
+        // remove the session storage flag after 15 minutes
+        interval = setInterval(() => {
+            const lastOpen = window.sessionStorage.getItem('hs-proactive-beacon-time');
+            if (!lastOpen || Date.now() - lastOpen > 10 * 60 * 1000) {
+                open();
+            }
+        }, 10000);
+
+    });
+
+</script>
+
+
+322*66
